@@ -17,8 +17,17 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+         <plugins>
+  <plugin>
+    <groupId>org.sonarsource.scanner.maven</groupId>
+    <artifactId>sonar-maven-plugin</artifactId>
+    <version>3.9.0.333</version> <!-- Downgraded to 3.9.0 -->
+  </plugin>
+</plugins>
          <properties>
   <sonar.host.url>https://sonarcloud.io</sonar.host.url>  <!-- Set the SonarCloud URL -->
 </properties>
+
+
 
 </project>
