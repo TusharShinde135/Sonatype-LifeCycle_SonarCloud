@@ -3,10 +3,10 @@ name: SonarCloud Analysis
 on:
   push:
     branches:
-      - main
+      - main # or your default branch
   pull_request:
     branches:
-      - main
+      - main # or your default branch
 
 jobs:
   sonarcloud:
@@ -14,39 +14,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout code from the repository
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      # Set up JDK (Updated to use Temurin, the Adoptium distribution)
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'  # You can use other versions like '8', '17' etc. depending on your requirements
-          distribution: 'temurin'  # Use Temurin JDK distribution (Adoptium)
+    - name: Set up JDK 11
+      uses: actions/setup-java@v3
+      with:
+        java-version: '11'
 
-      # Install Maven dependencies
-      - name: Cache Maven dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/*.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+    - name: Cache SonarCloud dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar-${{ hashFiles('**/*.gradle*', '**/*.maven*') }}
+        restore-keys: |
+          ${{ runner.os }}-sonar-
 
-      - name: Install Maven dependencies
-        run: mvn install -DskipTests
+    - name: Install dependencies
+      run: |
+        # Assuming you're using Maven or Gradle
+        mvn install # or gradle build, depending on your project
 
-      # Run SonarCloud scan using Maven plugin
-      - name: SonarCloud Scan with Maven
-        run: mvn clean verify sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.organization=${{ secrets.SONAR_ORG }}
+    - name: Run SonarCloud analysis
+      uses: sonarsource/sonarcloud-github-action@v2
+      with:
+        sonar-token: ${{ secrets.SONAR_TOKEN }}
 
-      # Run SonarCloud scan using GitHub Action (as fallback)
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@v2
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
-          SONAR_ORG: ${{ secrets.SONAR_ORG }}
-          SONAR_PROJECT_NAME: "sonarcloud-example"  # Optional
-          SONAR_HOST_URL: "https://sonarcloud.io"
+    - name: Upload Quality Gate status
+      uses: sonarsource/sonarcloud-github-action@v2
+      with:
+        sonar-token: ${{ secrets.SONAR_TOKEN }}
