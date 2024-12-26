@@ -1,0 +1,55 @@
+name: SonarCloud Analysis
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  sonarcloud:
+    name: SonarCloud Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Set up JDK (if required by your project)
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'  # Use the appropriate JDK version for your project
+          distribution: 'adoptopenjdk'
+
+      # Cache SonarCloud dependencies (Optional, but recommended for speed)
+      - name: Cache SonarCloud dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar-${{ hashFiles('**/*.java') }}
+          restore-keys: |
+            ${{ runner.os }}-sonar-
+
+      # Install dependencies (depending on your language, e.g., for Node.js or Maven)
+      - name: Install dependencies
+        run: |
+          if [ -f "package.json" ]; then
+            npm install
+          elif [ -f "pom.xml" ]; then
+            mvn install
+          fi
+
+      # Run SonarCloud scan
+      - name: SonarCloud Scan
+        uses: sonarsource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          sonar-project-key: ${{ secrets.SONAR_PROJECT_KEY }}
+          sonar-project-name: 'Your Project Name'
+          sonar-host-url: 'https://sonarcloud.io'
+
