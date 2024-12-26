@@ -37,12 +37,16 @@ jobs:
       - name: Install Maven dependencies
         run: mvn install -DskipTests
 
-      # Run SonarCloud scan
+      # Run SonarCloud scan using Maven plugin
+      - name: SonarCloud Scan with Maven
+        run: mvn clean verify sonar:sonar -Dsonar.login=${{ secrets.SONAR_TOKEN }} -Dsonar.projectKey=${{ secrets.SONAR_PROJECT_KEY }} -Dsonar.organization=${{ secrets.SONAR_ORG }}
+
+      # Run SonarCloud scan using GitHub Action (as fallback)
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
-          SONAR_ORG: ${{ secrets.SONAR_ORG }}  # Add this environment variable for organization
-          SONAR_PROJECT_NAME: "sonarcloud-example"  # Replace with your project name
+          SONAR_ORG: ${{ secrets.SONAR_ORG }}
+          SONAR_PROJECT_NAME: "sonarcloud-example"  # Optional
           SONAR_HOST_URL: "https://sonarcloud.io"
