@@ -2,7 +2,7 @@ name: SonarCloud Analysis
 
 on:
   push:
-    branches: 
+    branches:
       - main
   pull_request:
     branches:
@@ -40,9 +40,8 @@ jobs:
       # Run SonarCloud scan
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
-        with:
-          sonar-project-key: ${{ secrets.SONAR_PROJECT_KEY }}
-          sonar-project-name: "sonarcloud-example"
-          sonar-host-url: "https://sonarcloud.io"
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+          SONAR_PROJECT_NAME: "sonarcloud-example"  # Replace with your project name
+          SONAR_HOST_URL: "https://sonarcloud.io"
