@@ -18,38 +18,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Set up JDK (if required by your project)
+      # Set up JDK (Updated to use Adoptium distribution)
       - name: Set up JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          java-version: '11'  # Use the appropriate JDK version for your project
-          distribution: 'adoptopenjdk'
+          java-version: '11'  # You can update to the version you need
+          distribution: 'adoptium'  # Use Adoptium (formerly AdoptOpenJDK)
 
-      # Cache SonarCloud dependencies (Optional, but recommended for speed)
-      - name: Cache SonarCloud dependencies
+      # Install Maven dependencies
+      - name: Cache Maven dependencies
         uses: actions/cache@v2
         with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar-${{ hashFiles('**/*.java') }}
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/*.xml') }}
           restore-keys: |
-            ${{ runner.os }}-sonar-
+            ${{ runner.os }}-maven-
 
-      # Install dependencies (depending on your language, e.g., for Node.js or Maven)
-      - name: Install dependencies
-        run: |
-          if [ -f "package.json" ]; then
-            npm install
-          elif [ -f "pom.xml" ]; then
-            mvn install
-          fi
+      - name: Install Maven dependencies
+        run: mvn install -DskipTests
 
       # Run SonarCloud scan
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@v2
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           sonar-project-key: ${{ secrets.SONAR_PROJECT_KEY }}
-          sonar-project-name: 'Your Project Name'
-          sonar-host-url: 'https://sonarcloud.io'
-
+          sonar-project-name: "sonarcloud-example"
+          sonar-host-url: "https://sonarcloud.io"
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
