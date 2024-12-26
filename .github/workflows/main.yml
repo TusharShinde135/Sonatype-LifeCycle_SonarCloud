@@ -18,12 +18,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Set up JDK (Updated to use Adoptium distribution)
+      # Set up JDK (Updated to use Temurin, the Adoptium distribution)
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          java-version: '11'  # You can update to the version you need
-          distribution: 'adoptium'  # Use Adoptium (formerly AdoptOpenJDK)
+          java-version: '11'  # You can use other versions like '8', '17' etc. depending on your requirements
+          distribution: 'temurin'  # Use Temurin JDK distribution (Adoptium)
 
       # Install Maven dependencies
       - name: Cache Maven dependencies
