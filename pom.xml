@@ -17,4 +17,8 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+         <properties>
+  <sonar.host.url>https://sonarcloud.io</sonar.host.url>  <!-- Set the SonarCloud URL -->
+</properties>
+
 </project>
